@@ -25,7 +25,7 @@ def disneyReservation(event):
     chrome_options.binary_location = "./bin/headless-chromium"
 
     #Setup
-    driver = webdriver.Chrome(executable_path=('./bin/chromedriver'), options=chrome_options)  
+    driver = webdriver.Chrome(executable_path='./bin/chromedriver', chrome_options=chrome_options)  
     driver.get('https://disneyworld.disney.go.com/dining/magic-kingdom/cinderella-royal-table/')
     print("Got Page")
 
@@ -73,5 +73,5 @@ def disneyReservation(event):
     print("Done")
     driver.close()
 
-event={"partyTime" : "breakfast","partySize" : "2","reservationDate" : "02/09/2019"}
+event={"partyTime" : "breakfast","partySize" : "6","reservationDate" : "02/06/2019"}
 disneyReservation(event)

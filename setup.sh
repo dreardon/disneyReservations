@@ -11,6 +11,6 @@ unzip headless-chromium.zip -d ./bin/
 # Clean
 rm headless-chromium.zip chromedriver.zip
 
-virtualenv venvs
+virtualenv venvs --python=python3
 source venvs/bin/activate
 pip install -r requirements.txt
