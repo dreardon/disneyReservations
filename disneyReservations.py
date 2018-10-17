@@ -7,12 +7,9 @@ import boto3
 import datetime
 import logging
 
-def disneyReservation(event):
-    logging.basicConfig(filename='/opt/disneyReservations/disneyReservation.log', format='%(asctime)s %(message)s', level=logging.INFO)
+def disneyReservation(partyTimeLst,partySizeLst,reservationDateLst):
+    logging.basicConfig(filename='/opt/disneyReservations/disneyReservations.log', format='%(asctime)s %(message)s', level=logging.INFO)
 
-    partyTime = event['partyTime']
-    partySize = event['partySize']
-    reservationDate = event['reservationDate']
     chrome_options = Options()  
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
@@ -32,50 +29,52 @@ def disneyReservation(event):
     driver = webdriver.Chrome(executable_path='/opt/disneyReservations/bin/chromedriver', chrome_options=chrome_options)  
     driver.get('https://disneyworld.disney.go.com/dining/magic-kingdom/cinderella-royal-table/')
     logging.debug("Got Page")
+    for partyTime in partyTimeLst:
+        for partySize in partySizeLst:
+            for reservationDate in reservationDateLst:
+                #Select Party Size
+                driver.find_element_by_id("partySize-wrapper").click();
+                time.sleep(5)
+                xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
+                driver.find_element_by_xpath(xpath_sizeLoc).click();
+                logging.debug("Finished Party Size")
 
-    #Select Party Size
-    driver.find_element_by_id("partySize-wrapper").click();
-    time.sleep(5)
-    xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
-    driver.find_element_by_xpath(xpath_sizeLoc).click();
-    logging.debug("Finished Party Size")
+                #Select Time
+                driver.find_element_by_id("searchTime-wrapper").click();
+                time.sleep(5)
+                xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
+                driver.find_element_by_xpath(xpath_timeLoc).click();
+                logging.debug("Finished Time")
 
-    #Select Time
-    driver.find_element_by_id("searchTime-wrapper").click();
-    time.sleep(5)
-    xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
-    driver.find_element_by_xpath(xpath_timeLoc).click();
-    logging.debug("Finished Time")
-
-    #Select Date
-    date = driver.find_element_by_id("diningAvailabilityForm-searchDate");
-    time.sleep(10);
-    date.send_keys(Keys.CONTROL + "a");
-    date.send_keys(Keys.DELETE);
-    date.send_keys(reservationDate);
-    driver.find_element_by_id("checkAvailability").click();
-    logging.debug("Finished Date")
-    
-    #Determine Availability
-    driver.find_element_by_id("dineAvailSearchButton").click()
-    time.sleep(10);
-    try:
-        results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
-    except:
-        results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
-        client = boto3.client('sns')
-        response = client.publish(
-            TargetArn='arn:aws:sns:us-east-1:679695450108:DisneyRes',
-            Message=json.dumps({'default': 'Default Message',
-                                'sms': "Available Time at Cinderella's Royal Table for: " + partySize + ' people on ' + reservationDate + ' at ' + results.text,
-                                'email': "Available Time at Cinderella's Royal Table for: " + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
-            Subject='A New Reservation is Available',
-            MessageStructure='json'
-        )
-
-    logging.info(results.text.splitlines()[0])
+                #Select Date
+                date = driver.find_element_by_id("diningAvailabilityForm-searchDate");
+                time.sleep(10);
+                date.send_keys(Keys.CONTROL + "a");
+                date.send_keys(Keys.DELETE);
+                date.send_keys(reservationDate);
+                driver.find_element_by_id("checkAvailability").click();
+                logging.debug("Finished Date")
+                
+                #Determine Availability
+                driver.find_element_by_id("dineAvailSearchButton").click()
+                time.sleep(10);
+                try:
+                    results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
+                except:
+                    results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
+                    client = boto3.client('sns')
+                    response = client.publish(
+                        TargetArn='arn:aws:sns:us-east-1:679695450108:DisneyRes',
+                        Message=json.dumps({'default': 'Default Message',
+                                            'sms': "Available Time at Cinderella's Royal Table for: " + partySize + ' people on ' + reservationDate + ' at ' + results.text,
+                                            'email': "Available Time at Cinderella's Royal Table for: " + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
+                        Subject='A New Reservation is Available',
+                        MessageStructure='json'
+                    )
+                result = 'Time: '+ partyTime, 'Size: '+ partySize, 'Date: '+ reservationDate, 'Results: '+ results.text.splitlines()[0]
+                print(result)
+                logging.info(result)
     logging.debug("Done")
     driver.close()
 
-event={"partyTime" : "breakfast","partySize" : "6","reservationDate" : "02/06/2019"}
-disneyReservation(event)
+disneyReservation(['breakfast'],['6','2'],['02/06/2019','02/07/2019','02/08/2019'])
