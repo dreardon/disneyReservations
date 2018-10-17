@@ -4,8 +4,12 @@ from selenium import webdriver
 import os
 import time 
 import boto3
+import datetime
+import logging
 
 def disneyReservation(event):
+    logging.basicConfig(filename='/opt/disneyReservations/disneyReservation.log', format='%(asctime)s %(message)s', level=logging.INFO)
+
     partyTime = event['partyTime']
     partySize = event['partySize']
     reservationDate = event['reservationDate']
@@ -22,26 +26,26 @@ def disneyReservation(event):
     chrome_options.add_argument("--enable-precise-memory-info")
     chrome_options.add_argument("--disable-default-apps")
     chrome_options.add_argument("--window-size=1024,1000")
-    chrome_options.binary_location = "./bin/headless-chromium"
+    chrome_options.binary_location = "/opt/disneyReservations/bin/headless-chromium"
 
     #Setup
-    driver = webdriver.Chrome(executable_path=('./bin/chromedriver'), options=chrome_options)  
+    driver = webdriver.Chrome(executable_path='/opt/disneyReservations/bin/chromedriver', chrome_options=chrome_options)  
     driver.get('https://disneyworld.disney.go.com/dining/magic-kingdom/cinderella-royal-table/')
-    print("Got Page")
+    logging.debug("Got Page")
 
     #Select Party Size
     driver.find_element_by_id("partySize-wrapper").click();
     time.sleep(5)
     xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
     driver.find_element_by_xpath(xpath_sizeLoc).click();
-    print("Finished Party Size")
+    logging.debug("Finished Party Size")
 
     #Select Time
     driver.find_element_by_id("searchTime-wrapper").click();
     time.sleep(5)
     xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
     driver.find_element_by_xpath(xpath_timeLoc).click();
-    print("Finished Time")
+    logging.debug("Finished Time")
 
     #Select Date
     date = driver.find_element_by_id("diningAvailabilityForm-searchDate");
@@ -50,7 +54,7 @@ def disneyReservation(event):
     date.send_keys(Keys.DELETE);
     date.send_keys(reservationDate);
     driver.find_element_by_id("checkAvailability").click();
-    print("Finished Date")
+    logging.debug("Finished Date")
     
     #Determine Availability
     driver.find_element_by_id("dineAvailSearchButton").click()
@@ -69,9 +73,9 @@ def disneyReservation(event):
             MessageStructure='json'
         )
 
-    print(results.text)
-    print("Done")
+    logging.info(results.text.splitlines()[0])
+    logging.debug("Done")
     driver.close()
 
-event={"partyTime" : "breakfast","partySize" : "2","reservationDate" : "02/09/2019"}
+event={"partyTime" : "breakfast","partySize" : "6","reservationDate" : "02/06/2019"}
 disneyReservation(event)
