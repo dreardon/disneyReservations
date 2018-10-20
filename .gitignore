@@ -2,3 +2,4 @@ disneyReservations.log
 bin
 venvs
 .DS_Store
+.vscode
