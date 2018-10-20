@@ -6,8 +6,9 @@ import time
 import boto3
 import datetime
 import logging
+import json
 
-def disneyReservation(partyTimeLst,partySizeLst,reservationDateLst):
+def disneyReservation(location, partyTimeLst,partySizeLst,reservationDateLst):
     logging.basicConfig(filename='/opt/disneyReservations/disneyReservations.log', format='%(asctime)s %(message)s', level=logging.INFO)
 
     chrome_options = Options()  
@@ -27,7 +28,11 @@ def disneyReservation(partyTimeLst,partySizeLst,reservationDateLst):
 
     #Setup
     driver = webdriver.Chrome(executable_path='/opt/disneyReservations/bin/chromedriver', chrome_options=chrome_options)  
-    driver.get('https://disneyworld.disney.go.com/dining/magic-kingdom/cinderella-royal-table/')
+    if location=='''Chef Mickey's''':
+        url = 'https://disneyworld.disney.go.com/dining/contemporary-resort/chef-mickeys/'
+    if location=='''Cinderella's Royal Table''':
+        url = 'https://disneyworld.disney.go.com/dining/magic-kingdom/cinderella-royal-table/'
+    driver.get(url)
     logging.debug("Got Page")
     for partyTime in partyTimeLst:
         for partySize in partySizeLst:
@@ -66,15 +71,16 @@ def disneyReservation(partyTimeLst,partySizeLst,reservationDateLst):
                     response = client.publish(
                         TargetArn='arn:aws:sns:us-east-1:679695450108:DisneyRes',
                         Message=json.dumps({'default': 'Default Message',
-                                            'sms': "Available Time at Cinderella's Royal Table for: " + partySize + ' people on ' + reservationDate + ' at ' + results.text,
-                                            'email': "Available Time at Cinderella's Royal Table for: " + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
+                                            'sms': 'Available Time at ' + location + ' for: ' + partySize + ' people on ' + reservationDate + ' at ' + results.text,
+                                            'email': 'Available Time at ' + location + ' for: ' + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
                         Subject='A New Reservation is Available',
                         MessageStructure='json'
                     )
-                result = 'Time: '+ partyTime, 'Size: '+ partySize, 'Date: '+ reservationDate, 'Results: '+ results.text.splitlines()[0]
+                result = location + ' for: ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
                 print(result)
                 logging.info(result)
     logging.debug("Done")
     driver.close()
 
-disneyReservation(['breakfast'],['6','4'],['02/05/2019','02/06/2019','02/07/2019'])
+disneyReservation('''Cinderella's Royal Table''', ['breakfast'],['6','4'],['02/05/2019','02/06/2019','02/07/2019'])
+disneyReservation('''Chef Mickey's''', ['breakfast'],['6','4'],['02/05/2019','02/06/2019','02/07/2019'])
