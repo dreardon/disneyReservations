@@ -73,12 +73,12 @@ def disneyReservation(location, partyTimeLst,partySizeLst,reservationDateLst):
                     response = client.publish(
                         TargetArn='arn:aws:sns:us-east-1:679695450108:DisneyRes',
                         Message=json.dumps({'default': 'Default Message',
-                                            'sms': 'Available Time at ' + location + ' for: ' + partySize + ' people on ' + reservationDate + ' at ' + results.text,
-                                            'email': 'Available Time at ' + location + ' for: ' + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
+                                            'sms': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text,
+                                            'email': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
                         Subject='A New Reservation is Available',
                         MessageStructure='json'
                     )
-                result = location + ' for: ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
+                result = location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
                 print(result)
                 logging.info(result)
     logging.debug("Done")
