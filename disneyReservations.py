@@ -36,41 +36,41 @@ def disneyReservation(location, partyTimeLst,partySizeLst,reservationDateLst):
     logging.debug("Got Page")
     for partyTime in partyTimeLst:
         #Select Time
-        driver.find_element_by_id("searchTime-wrapper").click();
+        driver.find_element_by_id("searchTime-wrapper").click()
         time.sleep(5)
         xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
-        driver.find_element_by_xpath(xpath_timeLoc).click();
+        driver.find_element_by_xpath(xpath_timeLoc).click()
         logging.debug("Finished Time")
         
         for partySize in partySizeLst:
             #Select Party Size
-            driver.find_element_by_id("partySize-wrapper").click();
+            driver.find_element_by_id("partySize-wrapper").click()
             time.sleep(5)
             xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
-            driver.find_element_by_xpath(xpath_sizeLoc).click();
+            driver.find_element_by_xpath(xpath_sizeLoc).click()
             logging.debug("Finished Party Size")
             
             for reservationDate in reservationDateLst:
                 #Select Date
-                date = driver.find_element_by_id("diningAvailabilityForm-searchDate");
-                time.sleep(10);
-                date.send_keys(Keys.CONTROL + "a");
-                date.send_keys(Keys.DELETE);
-                date.send_keys(reservationDate);
-                driver.find_element_by_id("checkAvailability").click();
+                date = driver.find_element_by_id("diningAvailabilityForm-searchDate")
+                time.sleep(10)
+                date.send_keys(Keys.CONTROL + "a")
+                date.send_keys(Keys.DELETE)
+                date.send_keys(reservationDate)
+                driver.find_element_by_id("checkAvailability").click()
                 logging.debug("Finished Date")
                 
                 #Determine Availability
                 driver.find_element_by_id("dineAvailSearchButton").click()
-                time.sleep(10);
+                time.sleep(10)
                 try:
                     results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
                 except:
                     results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
                     if (results.text in ['11:05 AM', '11:10 AM'] and location=='''Chef Mickey's'''):
-                        continue;
+                        continue
                     client = boto3.client('sns')
-                    response = client.publish(
+                    client.publish(
                         TargetArn='arn:aws:sns:us-east-1:679695450108:DisneyRes',
                         Message=json.dumps({'default': 'Default Message',
                                             'sms': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text,
