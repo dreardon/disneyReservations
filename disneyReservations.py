@@ -35,22 +35,22 @@ def disneyReservation(location, partyTimeLst,partySizeLst,reservationDateLst):
     driver.get(url)
     logging.debug("Got Page")
     for partyTime in partyTimeLst:
+        #Select Time
+        driver.find_element_by_id("searchTime-wrapper").click();
+        time.sleep(5)
+        xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
+        driver.find_element_by_xpath(xpath_timeLoc).click();
+        logging.debug("Finished Time")
+        
         for partySize in partySizeLst:
+            #Select Party Size
+            driver.find_element_by_id("partySize-wrapper").click();
+            time.sleep(5)
+            xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
+            driver.find_element_by_xpath(xpath_sizeLoc).click();
+            logging.debug("Finished Party Size")
+            
             for reservationDate in reservationDateLst:
-                #Select Party Size
-                driver.find_element_by_id("partySize-wrapper").click();
-                time.sleep(5)
-                xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
-                driver.find_element_by_xpath(xpath_sizeLoc).click();
-                logging.debug("Finished Party Size")
-
-                #Select Time
-                driver.find_element_by_id("searchTime-wrapper").click();
-                time.sleep(5)
-                xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
-                driver.find_element_by_xpath(xpath_timeLoc).click();
-                logging.debug("Finished Time")
-
                 #Select Date
                 date = driver.find_element_by_id("diningAvailabilityForm-searchDate");
                 time.sleep(10);
