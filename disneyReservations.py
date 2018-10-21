@@ -68,6 +68,8 @@ def disneyReservation(location, partyTimeLst,partySizeLst,reservationDateLst):
                 except:
                     results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
                     if (results.text in ['11:05 AM', '11:10 AM'] and location=='''Chef Mickey's'''):
+                        result = 'Ignoring ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
+                        logging.info(result)
                         continue
                     client = boto3.client('sns')
                     client.publish(
