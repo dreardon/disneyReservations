@@ -2,15 +2,48 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 import os
+import sys
 import time 
 import boto3
 import datetime
 import logging
 import json
+import argparse
+import datetime
 
-def disneyReservation(location, partyTimeLst,partySizeLst,reservationDateLst):
-    logging.basicConfig(filename='/opt/disneyReservations/disneyReservations.log', format='%(asctime)s %(message)s', level=logging.INFO)
+def main():
+    #Setup Logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
+    #Parse Arguments and Set Defaults
+    now = datetime.datetime.now()
+    parser = argparse.ArgumentParser(description='Arguments to query reservation details.')
+    parser.add_argument('-t', '--time', default='dinner', help="Currently supports a comma separated list of times including 'breakfast' 'lunch' 'dinner'") 
+    parser.add_argument('-d', '--date', default=now.strftime("%m/%d/%Y"), help='A comma separated list of dates in the format mm/dd/yyyy')
+    parser.add_argument('-s', '--size', default='2', help='A comma separated list of integers between 1 and 49')  
+    parser.add_argument('-l', '--location', default='''Cinderella's Royal Table''', help="Currently supports a comma separated list of quoted string locations including 'Cinderella's Royal Table' and 'Chef Mickey's'")  
+    parser.add_argument('--debug', help="set debug level logging", action="store_true")
+    args = parser.parse_args()
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+    locationLst = args.location.split(',')
+    partyTimeLst = args.time.split(',')
+    partySizeLst = args.size.split(',')
+    reservationDateLst = args.date.split(',')
+
+    logging.debug(locationLst)
+    logging.debug(partySizeLst)
+    logging.debug(partyTimeLst)
+    logging.debug(reservationDateLst)
+
+    disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst)
+
+def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst):
     chrome_options = Options()  
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
@@ -25,66 +58,51 @@ def disneyReservation(location, partyTimeLst,partySizeLst,reservationDateLst):
     chrome_options.add_argument("--disable-default-apps")
     chrome_options.add_argument("--window-size=1024,1000")
     chrome_options.binary_location = "/opt/disneyReservations/bin/headless-chromium"
-
-    #Setup
     driver = webdriver.Chrome(executable_path='/opt/disneyReservations/bin/chromedriver', chrome_options=chrome_options)  
-    if location=='''Chef Mickey's''':
-        url = 'https://disneyworld.disney.go.com/dining/contemporary-resort/chef-mickeys/'
-    if location=='''Cinderella's Royal Table''':
-        url = 'https://disneyworld.disney.go.com/dining/magic-kingdom/cinderella-royal-table/'
-    driver.get(url)
-    logging.debug("Got Page")
-    for partyTime in partyTimeLst:
-        #Select Time
-        driver.find_element_by_id("searchTime-wrapper").click()
-        time.sleep(5)
-        xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
-        driver.find_element_by_xpath(xpath_timeLoc).click()
-        logging.debug("Finished Time")
-        
-        for partySize in partySizeLst:
-            #Select Party Size
-            driver.find_element_by_id("partySize-wrapper").click()
+    
+    for location in locationLst:
+        if location=='''Chef Mickey's''':
+            url = 'https://disneyworld.disney.go.com/dining/contemporary-resort/chef-mickeys/'
+        if location=='''Cinderella's Royal Table''':
+            url = 'https://disneyworld.disney.go.com/dining/magic-kingdom/cinderella-royal-table/'
+        driver.get(url)
+        logging.debug("Got Page")
+        for partyTime in partyTimeLst:
+            #Select Time
+            driver.find_element_by_id("searchTime-wrapper").click()
             time.sleep(5)
-            xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
-            driver.find_element_by_xpath(xpath_sizeLoc).click()
-            logging.debug("Finished Party Size")
+            xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
+            driver.find_element_by_xpath(xpath_timeLoc).click()
+            logging.debug("Finished Time")
             
-            for reservationDate in reservationDateLst:
-                #Select Date
-                date = driver.find_element_by_id("diningAvailabilityForm-searchDate")
-                time.sleep(10)
-                date.send_keys(Keys.CONTROL + "a")
-                date.send_keys(Keys.DELETE)
-                date.send_keys(reservationDate)
-                driver.find_element_by_id("checkAvailability").click()
-                logging.debug("Finished Date")
+            for partySize in partySizeLst:
+                #Select Party Size
+                driver.find_element_by_id("partySize-wrapper").click()
+                time.sleep(5)
+                xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
+                driver.find_element_by_xpath(xpath_sizeLoc).click()
+                logging.debug("Finished Party Size")
                 
-                #Determine Availability
-                driver.find_element_by_id("dineAvailSearchButton").click()
-                time.sleep(10)
-                try:
-                    results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
-                except:
-                    results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
-                    if (results.text in ['11:05 AM', '11:10 AM'] and location=='''Chef Mickey's'''):
-                        result = 'Ignoring ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
-                        logging.info(result)
-                        continue
-                    client = boto3.client('sns')
-                    client.publish(
-                        TargetArn='arn:aws:sns:us-east-1:679695450108:DisneyRes',
-                        Message=json.dumps({'default': 'Default Message',
-                                            'sms': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text,
-                                            'email': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
-                        Subject='A New Reservation is Available',
-                        MessageStructure='json'
-                    )
-                result = location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
-                print(result)
-                logging.info(result)
+                for reservationDate in reservationDateLst:
+                    #Select Date
+                    date = driver.find_element_by_id("diningAvailabilityForm-searchDate")
+                    time.sleep(10)
+                    date.send_keys(Keys.CONTROL + "a")
+                    date.send_keys(Keys.DELETE)
+                    date.send_keys(reservationDate)
+                    driver.find_element_by_id("checkAvailability").click()
+                    logging.debug("Finished Date")
+                    
+                    #Determine Availability
+                    driver.find_element_by_id("dineAvailSearchButton").click()
+                    time.sleep(10)
+                    try:
+                        results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
+                    except:
+                        results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
+                    result = location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
+                    logging.info(result)
     logging.debug("Done")
     driver.close()
 
-disneyReservation('''Cinderella's Royal Table''', ['breakfast'],['6','4'],['02/05/2019','02/06/2019','02/07/2019'])
-disneyReservation('''Chef Mickey's''', ['breakfast'],['6','4'],['02/05/2019','02/06/2019','02/07/2019'])
+if __name__ == "__main__": main()
