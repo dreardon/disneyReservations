@@ -1,5 +1,5 @@
 # Disney Reservation Checker
-This is a script used to check the availability of certain restaurants at Walt Disney World.
+This is a script used to check the availability of certain restaurants at Walt Disney World. If a spot is available, the script can send a notification to an AWS SNS topic.
 
 ## Usage
 ```python disneyReservations.py --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
@@ -21,16 +21,19 @@ Options:
               Currently supports a comma separated list of quoted
               string locations including "Cinderella's Royal Table"
               and "Chef Mickey's"
+  -n, --notification
+              SNS ARN for Notification Topic
   --debug DEBUG
               Set debug level logging
 </pre>
 
-### Script Defaults
+### Defaults
 
 * Time: 'dinner'
 * Size: '2'
 * Date: Today's date
 * Location: Cinderella's Royal Table
+* Notification: None
 
 ## Environment
 This script has been tested in a Linux environment with Python 3.6.5, but should work in other environments with the correct Chromedriver. There is an open TOOD to make the installation process environment agnostic.

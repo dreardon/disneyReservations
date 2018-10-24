@@ -27,6 +27,7 @@ def main():
     parser.add_argument('-d', '--date', default=now.strftime("%m/%d/%Y"), help='A comma separated list of dates in the format mm/dd/yyyy')
     parser.add_argument('-s', '--size', default='2', help='A comma separated list of integers between 1 and 49')  
     parser.add_argument('-l', '--location', default='''Cinderella's Royal Table''', help="Currently supports a comma separated list of quoted string locations including 'Cinderella's Royal Table' and 'Chef Mickey's'")  
+    parser.add_argument('-n', '--notification', default=None, help='SNS ARN for Notification Topic')  
     parser.add_argument('--debug', help="set debug level logging", action="store_true")
     args = parser.parse_args()
     if args.debug:
@@ -35,15 +36,17 @@ def main():
     partyTimeLst = args.time.split(',')
     partySizeLst = args.size.split(',')
     reservationDateLst = args.date.split(',')
+    notificationARN = args.notification
 
-    logging.debug(locationLst)
-    logging.debug(partySizeLst)
-    logging.debug(partyTimeLst)
-    logging.debug(reservationDateLst)
+    logging.debug('Location(s): ' + str(locationLst))
+    logging.debug('Party Size: ' + str(partySizeLst))
+    logging.debug('Party Time(s): ' + str(partyTimeLst))
+    logging.debug('Date(s): ' + str(reservationDateLst))
+    logging.debug('Notification ARN: ' + str(notificationARN))
 
-    disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst)
+    disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,notificationARN)
 
-def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst):
+def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,notificationARN):
     chrome_options = Options()  
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
@@ -104,15 +107,17 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst)
                             result = 'Ignoring ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
                             logging.info(result)
                             continue
-                        client = boto3.client('sns')
-                        client.publish(
-                            TargetArn='arn:aws:sns:us-east-1:679695450108:DisneyRes',
-                            Message=json.dumps({'default': 'Default Message',
-                                                'sms': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text,
-                                                'email': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
-                            Subject='A New Reservation is Available',
-                            MessageStructure='json'
-                        )
+                        if notificationARN:
+                            logging.debug('In Notification')
+                            client = boto3.client('sns', region_name='us-east-1')
+                            client.publish(
+                                TargetArn=notificationARN,
+                                Message=json.dumps({'default': 'Default Message',
+                                                    'sms': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text,
+                                                    'email': 'Available Time at ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' at ' + results.text}),
+                                Subject='A New Reservation is Available',
+                                MessageStructure='json'
+                            )
                     result = location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
                     logging.info(result)
     logging.debug("Done")
