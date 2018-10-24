@@ -103,10 +103,6 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
                         results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
                     except:
                         results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
-                        if (results.text in ['11:05 AM', '11:10 AM'] and location=='''Chef Mickey's'''):
-                            result = 'Ignoring ' + location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
-                            logging.info(result)
-                            continue
                         if notificationARN:
                             logging.debug('In Notification')
                             client = boto3.client('sns', region_name='us-east-1')
