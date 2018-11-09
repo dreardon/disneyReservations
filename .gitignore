@@ -3,3 +3,7 @@ bin
 venvs
 .DS_Store
 .vscode
+build
+disney_reservation.egg-info
+dist
+setup.py

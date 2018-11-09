@@ -60,9 +60,9 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
     chrome_options.add_argument("--enable-precise-memory-info")
     chrome_options.add_argument("--disable-default-apps")
     chrome_options.add_argument("--window-size=1024,1000")
-    chrome_options.binary_location = "/opt/disneyReservations/bin/headless-chromium"
-    driver = webdriver.Chrome(executable_path='/opt/disneyReservations/bin/chromedriver', chrome_options=chrome_options)  
-    
+    driver = webdriver.Chrome(chrome_options=chrome_options)  
+
+
     for location in locationLst:
         if location=='''Chef Mickey's''':
             url = 'https://disneyworld.disney.go.com/dining/contemporary-resort/chef-mickeys/'

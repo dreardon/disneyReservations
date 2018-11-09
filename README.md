@@ -1,10 +1,22 @@
 # Disney Reservation Checker
-This is a script used to check the availability of certain restaurants at Walt Disney World. If a spot is available, the script can send a notification to an AWS SNS topic.
+This is a tool used to check the availability of certain restaurants at Walt Disney World. If a spot is available, the script can send a notification to an AWS SNS topic.
 
-## Usage
+## Command Line Usage
+#### Setup
+```virtualenv venvs```
+
+```source venvs/bin/activate```
+
+```pip install -r requirements.txt```
+
+#### Command Line Examples
 ```python disneyReservations.py --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
 
-```python disneyReservations.py --size 4,6 --time 'breakfast','lunch' --location "Cinderella's Royal Table","Chef Mickey's" --date 02/05/2019,02/06/2019,02/07/2019```
+```python disneyReservations.py --size 4,6 --time 'breakfast','lunch' --location "Cinderella's Royal Table","Chef Mickey's" --date 02/06/2019,02/07/2019,02/08/2019```
+
+## Docker Usage
+```docker build -t dpreardon/disneyreservation .```
+```docker run dpreardon/disneyreservation:latest --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
 
 <pre>
 Usage:
@@ -36,8 +48,4 @@ Options:
 * Notification: None
 
 ## Environment
-This script has been tested in a Linux environment with Python 3.6.5, but should work in other environments with the correct Chromedriver. There is an open TOOD to make the installation process environment agnostic.
-
-## TODO
-Update Chromedriver and environment-specific logic to work for Mac, Windows, and Linux. Follow some of the Chromedriver/Selenium lessons here: https://github.com/mrooney/mintapi
-
+This tool has been tested in Linux and MacOS environments with Python 3.6, but should work in other environments with the correct Chromedriver.
