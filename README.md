@@ -16,6 +16,7 @@ This is a tool used to check the availability of certain restaurants at Walt Dis
 
 ## Docker Usage
 ```docker build -t dpreardon/disneyreservation .```
+
 ```docker run dpreardon/disneyreservation:latest --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
 
 <pre>
