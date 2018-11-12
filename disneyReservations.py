@@ -12,6 +12,8 @@ import argparse
 import datetime
 
 def main():
+    start = time.time()
+
     #Setup Logging
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -45,6 +47,8 @@ def main():
     logging.debug('Notification ARN: ' + str(notificationARN))
 
     disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,notificationARN)
+    end = time.time()
+    logging.debug('Elapsed Time: '+ str(start-end))
 
 def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,notificationARN):
     chrome_options = Options()  
@@ -73,7 +77,7 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
         for partyTime in partyTimeLst:
             #Select Time
             driver.find_element_by_id("searchTime-wrapper").click()
-            time.sleep(5)
+            time.sleep(0)
             xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
             driver.find_element_by_xpath(xpath_timeLoc).click()
             logging.debug("Finished Time")
@@ -81,7 +85,7 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
             for partySize in partySizeLst:
                 #Select Party Size
                 driver.find_element_by_id("partySize-wrapper").click()
-                time.sleep(5)
+                time.sleep(0)
                 xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
                 driver.find_element_by_xpath(xpath_sizeLoc).click()
                 logging.debug("Finished Party Size")
@@ -89,7 +93,7 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
                 for reservationDate in reservationDateLst:
                     #Select Date
                     date = driver.find_element_by_id("diningAvailabilityForm-searchDate")
-                    time.sleep(10)
+                    time.sleep(0)
                     date.send_keys(Keys.CONTROL + "a")
                     date.send_keys(Keys.DELETE)
                     date.send_keys(reservationDate)
@@ -98,7 +102,7 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
                     
                     #Determine Availability
                     driver.find_element_by_id("dineAvailSearchButton").click()
-                    time.sleep(10)
+                    time.sleep(4)
                     try:
                         results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
                     except:
@@ -116,7 +120,6 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
                             )
                     result = location + ' for ' + partySize + ' people on ' + reservationDate + ' for ' + partyTime, 'Results: '+ results.text.splitlines()[0]
                     logging.info(result)
-    logging.debug("Done")
     driver.close()
 
 if __name__ == "__main__": main()
