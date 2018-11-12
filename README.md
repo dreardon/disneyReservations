@@ -3,11 +3,12 @@ This is a tool used to check the availability of certain restaurants at Walt Dis
 
 ## Command Line Usage
 #### Setup
-```virtualenv venvs```
+1) ```virtualenv venvs```
 
-```source venvs/bin/activate```
+2) Linux/MacOS: ```source venvs/bin/activate``` or
+Windows: ```venvs\Scripts\activate```
 
-```pip install -r requirements.txt```
+3) ```pip install -r requirements.txt```
 
 #### Command Line Examples
 ```python disneyReservations.py --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
@@ -15,7 +16,9 @@ This is a tool used to check the availability of certain restaurants at Walt Dis
 ```python disneyReservations.py --size 4,6 --time 'breakfast','lunch' --location "Cinderella's Royal Table","Chef Mickey's" --date 02/06/2019,02/07/2019,02/08/2019```
 
 ## Docker Usage
-```docker build -t dpreardon/disneyreservation .```
+Local Github source: ```docker build -t dpreardon/disneyreservation .```
+
+Docker Hub: ```docker pull dpreardon/disneyreservation```
 
 ```docker run dpreardon/disneyreservation:latest --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
 
