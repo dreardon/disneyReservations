@@ -1,5 +1,8 @@
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 import os
 import sys
@@ -77,7 +80,7 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
         for partyTime in partyTimeLst:
             #Select Time
             driver.find_element_by_id("searchTime-wrapper").click()
-            time.sleep(0)
+            time.sleep(1)
             xpath_timeLoc = '''//li[@data-display=\"''' +partyTime+ '''\"]'''
             driver.find_element_by_xpath(xpath_timeLoc).click()
             logging.debug("Finished Time")
@@ -85,7 +88,7 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
             for partySize in partySizeLst:
                 #Select Party Size
                 driver.find_element_by_id("partySize-wrapper").click()
-                time.sleep(0)
+                time.sleep(1)
                 xpath_sizeLoc = '''//li[@data-value=\"''' +partySize+ '''\"]'''
                 driver.find_element_by_xpath(xpath_sizeLoc).click()
                 logging.debug("Finished Party Size")
@@ -93,17 +96,21 @@ def disneyReservation(locationLst, partyTimeLst,partySizeLst,reservationDateLst,
                 for reservationDate in reservationDateLst:
                     #Select Date
                     date = driver.find_element_by_id("diningAvailabilityForm-searchDate")
-                    time.sleep(0)
                     date.send_keys(Keys.CONTROL + "a")
                     date.send_keys(Keys.DELETE)
                     date.send_keys(reservationDate)
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.ID, "checkAvailability"))
+                    )
                     driver.find_element_by_id("checkAvailability").click()
                     logging.debug("Finished Date")
                     
                     #Determine Availability
                     driver.find_element_by_id("dineAvailSearchButton").click()
-                    time.sleep(4)
                     try:
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.CLASS_NAME, "ctaNoAvailableTimesContainer"))
+                        )
                         results = driver.find_element_by_class_name("ctaNoAvailableTimesContainer")
                     except:
                         results = driver.find_element_by_class_name("ctaAvailableTimesContainer")
