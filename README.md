@@ -11,34 +11,52 @@ Windows: ```venvs\Scripts\activate```
 3) ```pip install -r requirements.txt```
 
 #### Command Line Examples
-```python disneyReservations.py --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
+```python disneyReservations.py --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 07/05/2019```
 
-```python disneyReservations.py --size 4,6 --time 'breakfast','lunch' --location "Cinderella's Royal Table","Chef Mickey's" --date 02/06/2019,02/07/2019,02/08/2019```
+```python disneyReservations.py --size 4,6 --time 'breakfast','lunch' --location "Cinderella's Royal Table","Chef Mickey's" --date 07/06/2019,07/07/2019,07/08/2019```
 
 ## Docker Usage
 Local Github source: ```docker build -t dpreardon/disneyreservation .```
 
 Docker Hub: ```docker pull dpreardon/disneyreservation```
 
-```docker run dpreardon/disneyreservation:latest --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 02/05/2019```
+```docker run dpreardon/disneyreservation:latest --size 4 --time 'breakfast' --location "Cinderella's Royal Table" --date 07/05/2019```
 
 <pre>
 Usage:
-python disneyReservations.py --size 2 --time 'breakfast' --date 02/05/2019
+python disneyReservations.py --size 2 --time 'breakfast' --date 07/05/2019
 
 Options:
   -h, --help  Show this help message and exit
   -t, --time  Currently supports a comma separated list of times
-              including 'breakfast' 'lunch' 'dinner'
+              including 'breakfast' 'lunch' 'dinner' '7:00am' '6:00pm'
   -d, --date  A comma separated list of dates in the format
               mm/dd/yyyy
   -s, --size  A comma separated list of integers between 1 and 49
-  -l, --location
-              Currently supports a comma separated list of quoted
-              string locations including "Cinderella's Royal Table"
-              and "Chef Mickey's"
+  -l, --location Currently supports a comma separated list of quoted string locations including
+              '900 Park Fare'
+              'Akershus Royal Banquet Hall'
+              'Cape May Resort'
+              'Chef Mickey''s'
+              'Cinderella''s Royal Table'
+              'Crystal Palace'
+              'Broadway Concert Series Dining Package'
+              'Perfectly Princess Tea Party'
+              'Fantasmic! Dining Package'
+              'Garden Grill Restaurant'
+              'Garden Rocks Dinner Package'
+              'Breakfast with Goofy Ravello'
+              'Hollywood and Vine'
+              'Ohana'
+              'Rivers of Light Dining Package'
+              'Artists Point'
+              'Trattoria al Forna'
+              'Tusker Hour Restaurant'
+              'Wonderland Tea Party at 1900 Park Fare'
   -n, --notification
               SNS ARN for Notification Topic
+  -r, --region
+              AWS Region for SNS Notification
   --debug DEBUG
               Set debug level logging
 </pre>
