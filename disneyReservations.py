@@ -32,26 +32,26 @@ def main():
     parser.add_argument('-t', '--time', default='6:00pm', help="Currently supports a comma separated list of times including 'breakfast' 'lunch' 'dinner' '7:00am' '6:00pm'") 
     parser.add_argument('-d', '--date', default=now.strftime("%m/%d/%Y"), help='A comma separated list of dates in the format mm/dd/yyyy')
     parser.add_argument('-s', '--size', default='2', help='A comma separated list of integers between 1 and 49')  
-    parser.add_argument('-l', '--location', default='''Cinderella's Royal Table''', help=textwrap.dedent('''Currently supports a comma separated list of quoted string locations including
-'900 Park Fare'
-'Akershus Royal Banquet Hall'
-'Cape May Resort'
-'Chef Mickey''s'
-'Cinderella''s Royal Table'
-'Crystal Palace'
-'Broadway Concert Series Dining Package'
-'Perfectly Princess Tea Party'
-'Fantasmic! Dining Package'
-'Garden Grill Restaurant'
-'Garden Rocks Dinner Package'
-'Breakfast with Goofy Ravello'
-'Hollywood and Vine'
-'Ohana'
-'Rivers of Light Dining Package'
-'Artists Point'
-'Trattoria al Forna'
-'Tusker Hour Restaurant'
-'Wonderland Tea Party at 1900 Park Fare'
+    parser.add_argument('-l', '--location', default="Cinderella's Royal Table", help=textwrap.dedent('''Currently supports a comma separated list of quoted string locations including
+"900 Park Fare"
+"Akershus Royal Banquet Hall"
+"Cape May Resort"
+"Chef Mickey's"
+"Cinderella's Royal Table"
+"Crystal Palace"
+"Broadway Concert Series Dining Package"
+"Perfectly Princess Tea Party"
+"Fantasmic! Dining Package"
+"Garden Grill Restaurant"
+"Garden Rocks Dinner Package"
+"Breakfast with Goofy Ravello"
+"Hollywood and Vine"
+"Ohana"
+"Rivers of Light Dining Package"
+"Artists Point"
+"Trattoria al Forna"
+"Tusker Hour Restaurant"
+"Wonderland Tea Party at 1900 Park Fare"
 '''))
     parser.add_argument('-n', '--notification', default=None, help='SNS ARN for Notification Topic')  
     parser.add_argument('-r', '--region', default=None, help='AWS Region for SNS Notification') 

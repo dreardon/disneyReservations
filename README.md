@@ -34,25 +34,24 @@ Options:
               mm/dd/yyyy
   -s, --size  A comma separated list of integers between 1 and 49
   -l, --location Currently supports a comma separated list of quoted string locations including
-              '900 Park Fare'
-              'Akershus Royal Banquet Hall'
-              'Cape May Resort'
-              'Chef Mickey''s'
-              'Cinderella''s Royal Table'
-              'Crystal Palace'
-              'Broadway Concert Series Dining Package'
-              'Perfectly Princess Tea Party'
-              'Fantasmic! Dining Package'
-              'Garden Grill Restaurant'
-              'Garden Rocks Dinner Package'
-              'Breakfast with Goofy Ravello'
-              'Hollywood and Vine'
-              'Ohana'
-              'Rivers of Light Dining Package'
-              'Artists Point'
-              'Trattoria al Forna'
-              'Tusker Hour Restaurant'
-              'Wonderland Tea Party at 1900 Park Fare'
+              "900 Park Fare"
+              "Akershus Royal Banquet Hall"
+              "Cape May Resort"
+              "Chef Mickey''s"
+              "Cinderella''s Royal Table"
+              "Crystal Palace"
+              "Broadway Concert Series Dining Package"
+              "Perfectly Princess Tea Party"
+              "Garden Grill Restaurant"
+              "Garden Rocks Dinner Package"
+              "Breakfast with Goofy Ravello"
+              "Hollywood and Vine"
+              "Ohana"
+              "Rivers of Light Dining Package"
+              "Artists Point"
+              "Trattoria al Forna"
+              "Tusker Hour Restaurant"
+              "Wonderland Tea Party at 1900 Park Fare"
   -n, --notification
               SNS ARN for Notification Topic
   -r, --region
