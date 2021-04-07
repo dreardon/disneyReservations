@@ -1,4 +1,9 @@
-# Disney Reservation Checker
+
+
+# DEPRECATED - Disney Reservation Checker
+
+Update: The Disney dining website changed how dates and times are searched and this project isn't currently maintained.
+
 This is a tool used to check the availability of certain restaurants at Walt Disney World. If a spot is available, the script can send a notification to an AWS SNS topic.
 
 ## Command Line Usage
